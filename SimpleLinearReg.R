@@ -1,5 +1,5 @@
 #Set your workspace
-setwd('D:/EVARCITY')
+setwd('D:/<<workspace>>')
 
 #load data
 data = read.csv('Marketing_Data.csv',sep=',')
