@@ -1,5 +1,5 @@
 #Set your workspace
-setwd('D:/<<file location>>')
+setwd('D:/EVARCITY')
 
 #load data
 data = read.csv('Marketing_Data.csv',sep=',')
@@ -39,9 +39,48 @@ heatmap(cor(data[c(2,3)]),main = "Correlation Heatmap")
 
 
 
+# remove  ad_no as this is not used
+data = subset(data, select = -c(Ad_No) ) 
+
+
 # install and load ca tools
 install.packages('caTools')
 library(caTools)
 
+# check data snippet
+head(data)
 
+# split the data in training and testing
+sample = sample.split(data$sales,SplitRatio = 0.80)
+trainSet = subset(data, sample==TRUE)
+testSet = subset(data,sample==FALSE)
 
+#develop the lm model 
+
+model = lm(sales ~(youtube+facebook),data=trainSet )
+
+model$coefficients
+
+#apply the model into test set
+
+testInput = testSet[-3]
+
+testInput$sales_predict = predict(model,testInput)
+
+head(testInput)
+
+testSet$predicted_sales = testInput$sales_predict
+
+# validation either RMSE or MAPE
+
+install.packages('MLmetrics')
+library('MLmetrics')
+
+#using MAPE technique
+MAPE(testSet$predicted_sales,testSet$sales)*100
+#using RMSE technique 
+RMSE(testSet$predicted_sales,testSet$sales)
+
+# save the model
+
+saveRDS(model,"./price_prediction_model.rds")
